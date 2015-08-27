@@ -29,6 +29,15 @@ namespace asio {
 namespace ssl {
 namespace detail {
 
+inline uint32_t err_pack(uint32_t lib, uint32_t reason) {
+#if defined(OPENSSL_IS_BORINGSSL)
+  // BoringSSL drops the function argument to ERR_PACK.
+  return ERR_PACK(lib, reason);
+#else
+  return ERR_PACK(lib, 0, reason);
+#endif
+}
+
 engine::engine(SSL_CTX* context)
   : ssl_(::SSL_new(context))
 {
@@ -196,7 +205,7 @@ const asio::error_code& engine::map_error_code(
   if (BIO_wpending(ext_bio_))
   {
     ec = asio::error_code(
-        ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ),
+        err_pack(ERR_LIB_SSL, SSL_R_UNEXPECTED_RECORD),
         asio::error::get_ssl_category());
     return ec;
   }
@@ -210,7 +219,7 @@ const asio::error_code& engine::map_error_code(
   if ((::SSL_get_shutdown(ssl_) & SSL_RECEIVED_SHUTDOWN) == 0)
   {
     ec = asio::error_code(
-        ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ),
+        err_pack(ERR_LIB_SSL, SSL_R_UNEXPECTED_RECORD),
         asio::error::get_ssl_category());
   }
 
