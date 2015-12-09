@@ -204,9 +204,7 @@ const asio::error_code& engine::map_error_code(
   // If there's data yet to be read, it's an error.
   if (BIO_wpending(ext_bio_))
   {
-    ec = asio::error_code(
-        err_pack(ERR_LIB_SSL, SSL_R_UNEXPECTED_RECORD),
-        asio::error::get_ssl_category());
+    ec = asio::ssl::error::stream_truncated;
     return ec;
   }
 
@@ -218,9 +216,7 @@ const asio::error_code& engine::map_error_code(
   // Otherwise, the peer should have negotiated a proper shutdown.
   if ((::SSL_get_shutdown(ssl_) & SSL_RECEIVED_SHUTDOWN) == 0)
   {
-    ec = asio::error_code(
-        err_pack(ERR_LIB_SSL, SSL_R_UNEXPECTED_RECORD),
-        asio::error::get_ssl_category());
+    ec = asio::ssl::error::stream_truncated;
   }
 
   return ec;
