@@ -29,15 +29,6 @@ namespace asio {
 namespace ssl {
 namespace detail {
 
-inline uint32_t err_pack(uint32_t lib, uint32_t reason) {
-#if defined(OPENSSL_IS_BORINGSSL)
-  // BoringSSL drops the function argument to ERR_PACK.
-  return ERR_PACK(lib, reason);
-#else
-  return ERR_PACK(lib, 0, reason);
-#endif
-}
-
 engine::engine(SSL_CTX* context)
   : ssl_(::SSL_new(context))
 {
