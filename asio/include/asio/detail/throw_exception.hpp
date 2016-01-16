@@ -30,14 +30,14 @@ using boost::throw_exception;
 
 // Declare the throw_exception function for all targets.
 template <typename Exception>
-void throw_exception(const Exception& e);
+[[noreturn]] void throw_exception(const Exception& e);
 
 // Only define the throw_exception function when exceptions are enabled.
 // Otherwise, it is up to the application to provide a definition of this
 // function.
 # if !defined(ASIO_NO_EXCEPTIONS)
 template <typename Exception>
-void throw_exception(const Exception& e)
+[[noreturn]] void throw_exception(const Exception& e)
 {
   throw e;
 }
