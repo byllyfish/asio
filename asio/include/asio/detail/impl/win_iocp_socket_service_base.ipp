@@ -2,7 +2,7 @@
 // detail/impl/win_iocp_socket_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2017 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,7 +45,6 @@ void win_iocp_socket_service_base::base_shutdown()
   base_implementation_type* impl = impl_list_;
   while (impl)
   {
-    asio::error_code ignored_ec;
     close_for_destruction(*impl);
     impl = impl->next_;
   }
@@ -744,7 +743,7 @@ win_iocp_socket_service_base::get_nt_set_info()
   void* ptr = interlocked_compare_exchange_pointer(&nt_set_info_, 0, 0);
   if (!ptr)
   {
-    if (HMODULE h = GetModuleHandle("NTDLL.DLL"))
+    if (HMODULE h = ::GetModuleHandleA("NTDLL.DLL"))
       ptr = reinterpret_cast<void*>(GetProcAddress(h, "NtSetInformationFile"));
 
     // On failure, set nt_set_info_ to a special value to indicate that the
