@@ -540,35 +540,6 @@ public:
     return s;
   }
 
-  /// Set the timer's expiry time relative to now.
-  /**
-   * This function sets the expiry time. Any pending asynchronous wait
-   * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the asio::error::operation_aborted error code.
-   *
-   * @param expiry_time The expiry time to be used for the timer.
-   *
-   * @param ec Set to indicate what error occurred, if any.
-   *
-   * @return The number of asynchronous operations that were cancelled.
-   *
-   * @note If the timer has already expired when expires_after() is called,
-   * then the handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t expires_after(const duration& expiry_time,
-      asio::error_code& ec)
-  {
-    return this->get_service().expires_after(
-        this->get_implementation(), expiry_time, ec);
-  }
-
 #if !defined(ASIO_NO_DEPRECATED)
   /// (Deprecated: Use expiry().) Get the timer's expiry time relative to now.
   /**
