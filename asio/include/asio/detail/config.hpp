@@ -2,7 +2,7 @@
 // detail/config.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2018 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2019 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -120,11 +120,14 @@
 #endif // !defined(ASIO_HAS_MOVE)
 
 // If ASIO_MOVE_CAST isn't defined, and move support is available, define
-// ASIO_MOVE_ARG and ASIO_MOVE_CAST to take advantage of rvalue
-// references and perfect forwarding.
+// * ASIO_MOVE_ARG,
+// * ASIO_NONDEDUCED_MOVE_ARG, and
+// * ASIO_MOVE_CAST
+// to take advantage of rvalue references and perfect forwarding.
 #if defined(ASIO_HAS_MOVE) && !defined(ASIO_MOVE_CAST)
 # define ASIO_MOVE_ARG(type) type&&
 # define ASIO_MOVE_ARG2(type1, type2) type1, type2&&
+# define ASIO_NONDEDUCED_MOVE_ARG(type) type&
 # define ASIO_MOVE_CAST(type) static_cast<type&&>
 # define ASIO_MOVE_CAST2(type1, type2) static_cast<type1, type2&&>
 #endif // defined(ASIO_HAS_MOVE) && !defined(ASIO_MOVE_CAST)
@@ -150,6 +153,7 @@
 # else
 #  define ASIO_MOVE_ARG(type) type
 # endif
+# define ASIO_NONDEDUCED_MOVE_ARG(type) const type&
 # define ASIO_MOVE_CAST(type) static_cast<const type&>
 # define ASIO_MOVE_CAST2(type1, type2) static_cast<const type1, type2&>
 #endif // !defined(ASIO_MOVE_CAST)
@@ -1003,7 +1007,8 @@
    || defined(__FreeBSD__) \
    || defined(__NetBSD__) \
    || defined(__OpenBSD__) \
-   || defined(__linux__)
+   || defined(__linux__) \
+   || defined(__HAIKU__)
 #   define ASIO_HAS_UNISTD_H 1
 #  endif
 # endif // !defined(ASIO_HAS_BOOST_CONFIG)
@@ -1366,33 +1371,6 @@
 # endif // defined(__linux__)
         //   || (defined(__MACH__) && defined(__APPLE__))
 #endif // !defined(ASIO_DISABLE_SSIZE_T)
-
-// Helper macros to manage the transition away from the old services-based API.
-#if defined(ASIO_ENABLE_OLD_SERVICES)
-# define ASIO_SVC_TPARAM , typename Service
-# define ASIO_SVC_TPARAM_DEF1(d1) , typename Service d1
-# define ASIO_SVC_TPARAM_DEF2(d1, d2) , typename Service d1, d2
-# define ASIO_SVC_TARG , Service
-# define ASIO_SVC_T Service
-# define ASIO_SVC_TPARAM1 , typename Service1
-# define ASIO_SVC_TPARAM1_DEF1(d1) , typename Service1 d1
-# define ASIO_SVC_TPARAM1_DEF2(d1, d2) , typename Service1 d1, d2
-# define ASIO_SVC_TARG1 , Service1
-# define ASIO_SVC_T1 Service1
-# define ASIO_SVC_ACCESS public
-#else // defined(ASIO_ENABLE_OLD_SERVICES)
-# define ASIO_SVC_TPARAM
-# define ASIO_SVC_TPARAM_DEF1(d1)
-# define ASIO_SVC_TPARAM_DEF2(d1, d2)
-# define ASIO_SVC_TARG
-// ASIO_SVC_T is defined at each point of use.
-# define ASIO_SVC_TPARAM1
-# define ASIO_SVC_TPARAM1_DEF1(d1)
-# define ASIO_SVC_TPARAM1_DEF2(d1, d2)
-# define ASIO_SVC_TARG1
-// ASIO_SVC_T1 is defined at each point of use.
-# define ASIO_SVC_ACCESS protected
-#endif // defined(ASIO_ENABLE_OLD_SERVICES)
 
 // Helper macros to manage transition away from error_code return values.
 #if defined(ASIO_NO_DEPRECATED)
